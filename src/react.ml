@@ -16,8 +16,8 @@ end = struct
   type 'a weak
   type 'a t = 'a weak array
 
-  external ext_empty_weak: unit -> 'a weak = "WeakRef" [@@bs.val]
-  external ext_make_weak: 'a -> 'a weak = "WeakRef" [@@bs.val]
+  external ext_empty_weak: unit -> 'a weak = "WeakRef" [@@bs.new]
+  external ext_make_weak: 'a -> 'a weak = "WeakRef" [@@bs.new]
   external ext_deref: 'a weak -> 'a Js.Nullable.t = "deref" [@@bs.send]
 
   let deref w = ext_deref w |> Js.Nullable.toOption

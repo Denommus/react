@@ -23,7 +23,7 @@ end = struct
   let deref w = ext_deref w |> Js.Nullable.toOption
 
   let create i = Array.init i (fun _ -> ext_empty_weak ())
-  let check arr i = Array.get arr i |> deref |> Belt.Option.isSome
+  let check arr i = Array.get arr i |> ext_deref |> Js.Nullable.isNullable |> not
   let get arr i = Array.get arr i |> deref
   let set arr i value = match value with
     | Some v -> ext_make_weak v |> Array.set arr i

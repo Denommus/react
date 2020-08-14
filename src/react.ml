@@ -3,6 +3,35 @@
    Distributed under the ISC license, see terms at the end of the file.
   ---------------------------------------------------------------------------*)
 
+module Weak: sig
+  type 'a t
+
+  val create: int -> 'a t
+  val check: 'a t -> int -> bool
+  val get: 'a t -> int -> 'a option
+  val set: 'a t -> int -> 'a option -> unit
+  val blit: 'a t -> int -> 'a t -> int -> int -> unit
+  val length: 'a t -> int
+end = struct
+  type 'a weak
+  type 'a t = 'a weak array
+
+  external ext_empty_weak: unit -> 'a weak = "Weak" [@@bs.val]
+  external ext_make_weak: 'a -> 'a weak = "Weak" [@@bs.val]
+  external ext_deref: 'a weak -> 'a Js.Nullable.t = "deref" [@@bs.send]
+
+  let deref w = ext_deref w |> Js.Nullable.toOption
+
+  let create i = Array.init i (fun _ -> ext_empty_weak ())
+  let check arr i = Array.get arr i |> deref |> Belt.Option.isSome
+  let get arr i = Array.get arr i |> deref
+  let set arr i value = match value with
+    | Some v -> ext_make_weak v |> Array.set arr i
+    | None -> ext_empty_weak () |> Array.set arr i
+  let blit arr1 off1 arr2 off2 len = Array.blit arr1 off1 arr2 off2 len
+  let length arr = Array.length arr
+end
+
 let err_max_rank = "maximal rank exceeded"
 let err_sig_undef = "signal value undefined yet"
 let err_fix = "trying to fix a delayed value"

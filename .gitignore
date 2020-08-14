@@ -9,3 +9,4 @@ tmp
 .merlin
 lib/
 node_modules/
+package-lock.json

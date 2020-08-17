@@ -14,21 +14,19 @@ module Weak: sig
   val length: 'a t -> int
 end = struct
   type 'a weak
-  type 'a t = 'a weak array
+  type 'a t = 'a weak option array
 
-  external ext_empty_weak: unit -> 'a weak = "WeakRef" [@@bs.new]
   external ext_make_weak: 'a -> 'a weak = "WeakRef" [@@bs.new]
   external ext_deref: 'a weak -> 'a Js.Nullable.t = "deref" [@@bs.send]
 
   let deref w = ext_deref w |> Js.Nullable.toOption
 
-  let create i = Array.init i (fun _ -> ext_empty_weak ())
-  let check arr i = Array.get arr i |> ext_deref |> Js.Nullable.isNullable |> not
-  let get arr i = Array.get arr i |> deref
-  let set arr i value = match value with
-    | Some v -> ext_make_weak v |> Array.set arr i
-    | None -> ext_empty_weak () |> Array.set arr i
-  let blit arr1 off1 arr2 off2 len = Array.blit arr1 off1 arr2 off2 len
+  let create i = Array.init i (fun _ -> None)
+  let check arr i = Belt.Option.getWithDefault (Belt.Option.map (Array.get arr i) (fun x -> ext_deref x  |> Js.Nullable.isNullable |> not)) false
+  let get arr i = Belt.Option.flatMap (Array.get arr i) deref
+  let set arr i value = Belt.Option.map value ext_make_weak |> Array.set arr i
+  let blit arr1 off1 arr2 off2 len = try Array.blit arr1 off1 arr2 off2 len with
+    Invalid_argument _ -> raise (Invalid_argument "Weak.blit")
   let length arr = Array.length arr
 end
 

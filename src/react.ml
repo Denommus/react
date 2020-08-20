@@ -3,6 +3,7 @@
    Distributed under the ISC license, see terms at the end of the file.
   ---------------------------------------------------------------------------*)
 
+#if BS then
 module Weak: sig
   type 'a t
 
@@ -22,13 +23,16 @@ end = struct
   let deref w = ext_deref w |> Js.Nullable.toOption
 
   let create i = Array.init i (fun _ -> None)
-  let check arr i = Belt.Option.getWithDefault (Belt.Option.map (Array.get arr i) (fun x -> ext_deref x  |> Js.Nullable.isNullable |> not)) false
-  let get arr i = Belt.Option.flatMap (Array.get arr i) deref
+  let check arr i = Array.get arr i
+                    |. Belt.Option.map (fun x -> ext_deref x |> Js.Nullable.isNullable |> not)
+                    |. Belt.Option.getWithDefault false
+  let get arr i = Array.get arr i |. Belt.Option.flatMap deref
   let set arr i value = Belt.Option.map value ext_make_weak |> Array.set arr i
   let blit arr1 off1 arr2 off2 len = try Array.blit arr1 off1 arr2 off2 len with
     Invalid_argument _ -> raise (Invalid_argument "Weak.blit")
   let length arr = Array.length arr
 end
+#end
 
 let err_max_rank = "maximal rank exceeded"
 let err_sig_undef = "signal value undefined yet"

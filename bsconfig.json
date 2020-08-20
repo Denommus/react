@@ -12,6 +12,8 @@
     {
       "dir": "src",
       "files": [
+        "weak.ml",
+        "weak.mli",
         "react.ml",
         "react.mli"
       ]

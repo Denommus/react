@@ -3,37 +3,6 @@
    Distributed under the ISC license, see terms at the end of the file.
   ---------------------------------------------------------------------------*)
 
-#if BS then
-module Weak: sig
-  type 'a t
-
-  val create: int -> 'a t
-  val check: 'a t -> int -> bool
-  val get: 'a t -> int -> 'a option
-  val set: 'a t -> int -> 'a option -> unit
-  val blit: 'a t -> int -> 'a t -> int -> int -> unit
-  val length: 'a t -> int
-end = struct
-  type 'a weak
-  type 'a t = 'a weak option array
-
-  external ext_make_weak: 'a -> 'a weak = "WeakRef" [@@bs.new]
-  external ext_deref: 'a weak -> 'a Js.Nullable.t = "deref" [@@bs.send]
-
-  let deref w = ext_deref w |> Js.Nullable.toOption
-
-  let create i = Array.init i (fun _ -> None)
-  let check arr i = Array.get arr i
-                    |. Belt.Option.map (fun x -> ext_deref x |> Js.Nullable.isNullable |> not)
-                    |. Belt.Option.getWithDefault false
-  let get arr i = Array.get arr i |. Belt.Option.flatMap deref
-  let set arr i value = Belt.Option.map value ext_make_weak |> Array.set arr i
-  let blit arr1 off1 arr2 off2 len = try Array.blit arr1 off1 arr2 off2 len with
-    Invalid_argument _ -> raise (Invalid_argument "Weak.blit")
-  let length arr = Array.length arr
-end
-#end
-
 let err_max_rank = "maximal rank exceeded"
 let err_sig_undef = "signal value undefined yet"
 let err_fix = "trying to fix a delayed value"

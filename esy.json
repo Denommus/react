@@ -1,9 +1,16 @@
 {
+  "name": "react-frp",
   "devDependencies": {
     "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam",
     "ocaml": "4.6.x",
     "@opam/utop": "*",
     "@opam/rtop": "*",
     "@opam/reason": "*"
+  },
+  "scripts": {
+    "utop": "dune utop"
+  },
+  "esy": {
+    "build": ["dune build"]
   }
 }

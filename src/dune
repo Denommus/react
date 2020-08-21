@@ -1,6 +1,7 @@
 (library
-  (name React)
-  (modules react))
+ (name React)
+ (public_name React)
+ (modules react))
 (env
-  (dev
-    (flags (:standard -warn-error -A))))
+ (dev
+  (flags (:standard -warn-error -A))))

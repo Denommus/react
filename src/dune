@@ -1,9 +1,8 @@
 (library
-  (name react)
-  (public_name react)
+  (name React)
   (modules react))
 (executable
-  (name react_top)
+  (name React_top)
   (modules react_top react_top_init)
   (libraries  compiler-libs.toplevel react)
   (link_flags (-linkall))

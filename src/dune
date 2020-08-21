@@ -1,12 +1,6 @@
 (library
   (name React)
   (modules react))
-(executable
-  (name React_top)
-  (modules react_top react_top_init)
-  (libraries  compiler-libs.toplevel react)
-  (link_flags (-linkall))
-  (modes byte))
 (env
   (dev
     (flags (:standard -warn-error -A))))
